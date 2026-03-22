@@ -1,0 +1,37 @@
+#!/bin/bash
+cd /root/OpenRLHF
+python3 -m openrlhf.cli.train_ppo_ray \
+    --pretrain /root/models/Qwen2.5-7B \
+    --remote_rm_url http://localhost:5000/get_reward \
+    --input_key input \
+    --save_path /root/CodeGenerate_RL_Pipeline_v2/checkpoints/qwen7b_grpo_zero2 \
+    --ckpt_path /root/CodeGenerate_RL_Pipeline_v2/checkpoints/qwen7b_grpo_zero2/ckpt \
+    --save_hf_ckpt \
+    --save_steps 10 \
+    --actor_num_nodes 1 \
+    --actor_num_gpus_per_node 4 \
+    --ref_num_nodes 1 \
+    --ref_num_gpus_per_node 4 \
+    --vllm_num_engines 0 \
+    --vllm_tensor_parallel_size 1 \
+    --colocate_actor_ref \
+    --zero_stage 2 \
+    --adam_offload \
+    --bf16 \
+    --gradient_checkpointing \
+    --advantage_estimator group_norm \
+    --n_samples_per_prompt 8 \
+    --init_kl_coef 0.01 \
+    --train_batch_size 32 \
+    --micro_train_batch_size 2 \
+    --rollout_batch_size 32 \
+    --micro_rollout_batch_size 4 \
+    --prompt_max_len 512 \
+    --generate_max_len 256 \
+    --max_epochs 1 \
+    --max_samples 1000 \
+    --actor_learning_rate 5e-7 \
+    --critic_learning_rate 9e-6 \
+    --prompt_data /root/coderl_data/train.jsonl \
+    --enforce_eager \
+    --use_wandb True
